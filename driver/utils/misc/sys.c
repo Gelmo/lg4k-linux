@@ -358,10 +358,6 @@ void *sys_fopen(const char *filename, enum sys_fop_flag_e flag)
     else if ((flag & SYS_FOP_FLAG_WRITE_BIT))
         new_flag = O_WRONLY;
 
-    if (0 == vfs_stat(filename, &stat))
-        pr_info("file size:%lld", stat.size);
-
-
     fp = filp_open(filename, new_flag, 0);
 
     return IS_ERR(fp) ? NULL : fp;
@@ -375,21 +371,13 @@ void sys_fclose(void *fp)
 
 SIZE_T sys_fread(void *fp, void *buf, SIZE_T size, SIZE_T count, SIZE_T offset)
 {
-    mm_segment_t fs;
     loff_t pos = offset;
     SIZE_T res;
 
-    fs =get_fs();
-    set_fs(KERNEL_DS);
-
-//    vfs_read(fp, buf, count, &pos);
-    res = vfs_read(fp, buf, count, &pos);
-    if (res > 0) {
-//        ((struct file*)fp)->f_pos = pos;
-//        pr_info("read size:%d", (int)res);
+    res = kernel_read(fp, buf, count, &pos);
+    if (res == 0) {
+        printk(KERN_INFO "kernel read: read zero bytes\n", res);
     }
-
-    set_fs(fs);
 
     return res;
 }
