@@ -90,7 +90,6 @@ static const framegrabber_pixfmt_t support_pixfmts[] = {
 		.is_yuv   = false,
 		.pixfmt_out = RGBQ,
 	},
-	#endif
 	[FRAMEGRABBER_PIXFMT_RGB24]={ //RGB3 index=8
 		.name     = "RGB24 (LE)",
 		.fourcc   = V4L2_PIX_FMT_RGB24, /* rgb */
@@ -98,7 +97,7 @@ static const framegrabber_pixfmt_t support_pixfmts[] = {
 		.is_yuv   = false,
 		.pixfmt_out = RGB3,
 	},
-	#if 0
+	#endif
 	[FRAMEGRABBER_PIXFMT_BGR24]={ //BGR3
 		.name     = "RGB24 (BE)",
 		.fourcc   = V4L2_PIX_FMT_BGR24, /* bgr */
@@ -106,6 +105,7 @@ static const framegrabber_pixfmt_t support_pixfmts[] = {
 		.is_yuv   = false,
 		.pixfmt_out = BGR3,
 	},
+	#if 0
 	[FRAMEGRABBER_PIXFMT_RGB32]={ //RGB4
 		.name     = "RGB32 (LE)",
 		.fourcc   = V4L2_PIX_FMT_RGB32, /* argb */
@@ -121,6 +121,22 @@ static const framegrabber_pixfmt_t support_pixfmts[] = {
 		.pixfmt_out = BGR4,
 	},
 	#endif
+#if 1 //[AVTLD-79]+
+	[FRAMEGRABBER_PIXFMT_NV12]={ //NV12
+		.name     = "NV12",
+		.fourcc   = V4L2_PIX_FMT_NV12, /* NV12 */
+		.depth    = 12,
+		.is_yuv   = true,
+		.pixfmt_out = NV12,
+	},
+	[FRAMEGRABBER_PIXFMT_YV12]={ //YV12
+		.name     = "YV12",
+		.fourcc   = V4L2_PIX_FMT_YVU420, /* YV12 */
+		.depth    = 12,
+		.is_yuv   = true,
+		.pixfmt_out = YVU420,
+	}
+#endif //[AVTLD-79]-
 };
 
 static const framegrabber_frame_size_t framegrabber_support_frame_size[FRAMEGRABBER_SUPPORT_FRAMESIZE_NUM] = {
@@ -522,6 +538,65 @@ void framegrabber_s_out_framesize(framegrabber_handle_t handle,int width,int hei
 		context->interface.s_framesize(handle,width,height);
 }
 
+unsigned framegrabber_g_out_planarbuffersize(framegrabber_handle_t handle, int plane)
+{
+    framegrabber_context_t *context=framegrabber_getcontext(handle);
+    const framegrabber_pixfmt_t *pixfmt;
+    int width, height;
+    unsigned out_planarbufsize;
+
+    if (!context)
+    {
+        pr_err("ERROR: context is NULL");
+        return 0;
+    }
+
+    pixfmt = &support_pixfmts[context->current_out_pixfmt];
+    width = context->current_out_framesize.width;
+    height = context->current_out_framesize.height;
+    out_planarbufsize=0;
+
+    switch (pixfmt->pixfmt_out)
+    {
+    case NV12:
+        if (plane == 1)
+            out_planarbufsize = width * height;
+        else if (plane == 2)
+            out_planarbufsize = (width * height) >> 1;
+        break;
+    case YVU420: //YV12
+        if (plane == 1)
+            out_planarbufsize = width * height;
+        else if (plane == 2)
+            out_planarbufsize = ((width >> 1) * (height >> 1));
+        else if (plane == 3)
+            out_planarbufsize = ((width >> 1) * (height >> 1));
+        break;
+    case RGB3:
+    case BGR3:
+        if (plane == 1)
+            out_planarbufsize = width * height * 3;
+        break;
+    default:
+        if (plane == 1)
+            out_planarbufsize = width * height * 2;
+        break;
+    }
+
+    return out_planarbufsize;
+}
+
+unsigned framegrabber_g_out_framebuffersize(framegrabber_handle_t handle)
+{
+    unsigned out_framebufsize = 0;
+
+    out_framebufsize += framegrabber_g_out_planarbuffersize(handle, 1);
+    out_framebufsize += framegrabber_g_out_planarbuffersize(handle, 2);
+    out_framebufsize += framegrabber_g_out_planarbuffersize(handle, 3);
+
+    return out_framebufsize;
+}
+
 unsigned framegrabber_g_max_framebuffersize(framegrabber_handle_t handle)
 {
     framegrabber_context_t *context=framegrabber_getcontext(handle);
@@ -533,9 +608,23 @@ unsigned framegrabber_g_max_framebuffersize(framegrabber_handle_t handle)
     return max_framebufsize;
 }
 
+void framegrabber_s_out_bytesperline(framegrabber_handle_t handle, unsigned bytesperline)
+{
+    framegrabber_context_t *context=framegrabber_getcontext(handle);
+
+    if (!context)
+    {
+        pr_err("ERROR: context is NULL");
+        return;
+    }
+
+    context->current_output_bytesperline = bytesperline;
+}
+
 unsigned framegrabber_g_out_bytesperline(framegrabber_handle_t handle)
 {
 	framegrabber_context_t *context=framegrabber_getcontext(handle);
+#if 0 //[AVTLD-79]+
 	const framegrabber_pixfmt_t *pixfmt=framegrabber_g_out_pixelfmt(handle);
 	unsigned bytesperline;
 
@@ -551,6 +640,16 @@ unsigned framegrabber_g_out_bytesperline(framegrabber_handle_t handle)
 
 
 	return bytesperline;
+#else
+
+    if (!context)
+    {
+        pr_err("ERROR: context is NULL");
+        return 0;
+    }
+
+    return context->current_output_bytesperline;
+#endif //[AVTLD-79]-
 }
 
 void framegrabber_g_out_framesize(framegrabber_handle_t handle,int *width,int *height)

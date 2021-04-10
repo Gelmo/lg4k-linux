@@ -317,6 +317,8 @@ typedef enum
 	AVER_XILINX_FMT_UYVY,
 	AVER_XILINX_FMT_YVYU,
 	AVER_XILINX_FMT_VYUY,
+	AVER_XILINX_FMT_YVU420, //YV12
+	AVER_XILINX_FMT_NV12,
 	AVER_XILINX_FMT_RGBP,
 	AVER_XILINX_FMT_RGBR,
 	AVER_XILINX_FMT_RGBO,
@@ -450,6 +452,9 @@ void aver_xilinx_set_audio_dma(handle_t aver_xilinx_handle,aver_xilinx_audio_cfg
 void aver_xilinx_start_audio_streaming(handle_t aver_xilinx_handle,aver_xilinx_audio_cbinfo_t *cb_info);
 void aver_xilinx_stop_audio_streaming(handle_t aver_xilinx_handle);
 void aver_xilinx_add_to_cur_desclist(handle_t aver_xilinx_handle,unsigned long phys_addr,unsigned size);
+#if 1 //[AVTLD-79]+
+void aver_xilinx_translate_desclist(handle_t aver_xilinx_handle, unsigned int size, unsigned int size_2, unsigned int size_3);
+#endif //[AVTLD-79]-
 void aver_xilinx_active_current_desclist(handle_t aver_xilinx_handle,aver_xilinx_callback_t callback,void *cb_cxt);
 void aver_xilinx_config_video_process(handle_t aver_xilinx_handle,aver_xilinx_video_process_cfg_t *vip_cfg);
 void aver_xilinx_get_frameinfo(handle_t aver_xilinx_handle,aver_xilinx_frame_info_t *frameinfo,U32_T pixelclock); 

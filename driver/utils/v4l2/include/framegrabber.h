@@ -89,13 +89,15 @@ typedef enum
 	FRAMEGRABBER_PIXFMT_RGB565X,
 	FRAMEGRABBER_PIXFMT_RGB555,
 	FRAMEGRABBER_PIXFMT_RGB555X,
-	#endif
 	FRAMEGRABBER_PIXFMT_RGB24,
-	#if 0
+	#endif
 	FRAMEGRABBER_PIXFMT_BGR24,
+	#if 0
 	FRAMEGRABBER_PIXFMT_RGB32,
 	FRAMEGRABBER_PIXFMT_BGR32,
 	#endif
+	FRAMEGRABBER_PIXFMT_NV12,
+	FRAMEGRABBER_PIXFMT_YV12,
 	FRAMEGRABBER_PIXFMT_MAX,
 }framegrabber_pixfmt_e;
 
@@ -110,13 +112,15 @@ typedef enum
 	EnumtoBitMask(FRAMEGRABBER_PIXFMT_RGB565X),
 	EnumtoBitMask(FRAMEGRABBER_PIXFMT_RGB555),
 	EnumtoBitMask(FRAMEGRABBER_PIXFMT_RGB555X),
-	#endif
 	EnumtoBitMask(FRAMEGRABBER_PIXFMT_RGB24),
-	#if 0
+	#endif
 	EnumtoBitMask(FRAMEGRABBER_PIXFMT_BGR24),
+	#if 0
 	EnumtoBitMask(FRAMEGRABBER_PIXFMT_RGB32),
 	EnumtoBitMask(FRAMEGRABBER_PIXFMT_BGR32),
 	#endif
+	EnumtoBitMask(FRAMEGRABBER_PIXFMT_NV12),
+	EnumtoBitMask(FRAMEGRABBER_PIXFMT_YV12),
 	FRAMEGRABBER_PIXFMT_BITMSK		= (1<<FRAMEGRABBER_PIXFMT_MAX)-1,
 }framegrabber_pixfmt_bitmask_e;
 
@@ -203,6 +207,8 @@ typedef enum
 	UYVY,
 	YVYU,
 	VYUY,
+	YVU420, //YV12
+	NV12,
 	RGBP,
 	RGBR,
 	RGBO,
@@ -398,6 +404,8 @@ int framegrabber_s_out_pixelfmt(framegrabber_handle_t handle,U32_T fourcc);
 int framegrabber_g_supportframesize(framegrabber_handle_t handle,int index,int *width,int *height);
 int framegrabber_g_framesize_supportrefreshrate(framegrabber_handle_t handle,int width,int height,int index);
 void framegrabber_notify(framegrabber_handle_t handle,char *fromname,int notification,void *arg);
+unsigned framegrabber_g_out_planarbuffersize(framegrabber_handle_t handle, int plane);
+unsigned framegrabber_g_out_framebuffersize(framegrabber_handle_t handle);
 unsigned framegrabber_g_max_framebuffersize(framegrabber_handle_t handle);
 void framegrabber_s_out_framesize(framegrabber_handle_t handle,int width,int height);
 void framegrabber_g_out_framesize(framegrabber_handle_t handle,int *width,int *height);
@@ -415,6 +423,7 @@ void framegrabber_s_input_framemode(framegrabber_handle_t handle,framegrabber_fr
 void framegrabber_s_input_audioinfo(framegrabber_handle_t handle,enum framegrabber_audio_sample audioinfo);
 int framegrabber_g_input_audioinfo(framegrabber_handle_t handle);
 framegrabber_framemode_e framegrabber_g_input_framemode(framegrabber_handle_t handle);
+void framegrabber_s_out_bytesperline(framegrabber_handle_t handle, unsigned bytesperline);
 unsigned framegrabber_g_out_bytesperline(framegrabber_handle_t handle);
 
 int framegrabber_g_input_bchs(framegrabber_handle_t handle,int bchs_select);

@@ -106,6 +106,8 @@ static int v4l2_model_qops_queue_setup(struct vb2_queue *q,
 	unsigned framebufsize;
 	int width, height;
 	unsigned bytesperline;
+	const framegrabber_pixfmt_t *pixfmt;
+	framegrabber_pixfmt_enum_t pixfmt_out;
 
 //    pixfmt = framegrabber_g_out_pixelfmt(v4l2m_context->framegrabber_handle);
 //    if (width == 0 || height == 0)
@@ -146,8 +148,16 @@ static int v4l2_model_qops_queue_setup(struct vb2_queue *q,
 	       framebufsize, width, height);
 	}   
 	
-	//pr_info("%s framebufsize %u, width %d, height %d\n", __func__,
+	pixfmt = framegrabber_g_out_pixelfmt(v4l2m_context->framegrabber_handle);
+	pixfmt_out = pixfmt->pixfmt_out;
+
+
+	//printk("%s framebufsize %u, width %d, height %d\n", __func__,
 	//       framebufsize, width, height);
+
+	framebufsize = framegrabber_g_out_framebuffersize(v4l2m_context->framegrabber_handle);
+	printk("%s >>>>>> framebufsize %u, width %d, height %d\n",
+		__func__, framebufsize, width, height);
 
 	if (v4l2m_context->pic_bmp_handle)
 	{
@@ -159,7 +169,12 @@ static int v4l2_model_qops_queue_setup(struct vb2_queue *q,
 		vb2_context->image_data = vmalloc(framebufsize);
 
 		pic_bmp_prepare(v4l2m_context->pic_bmp_handle, 640, 480, width, height);
-		load_no_signal_image(v4l2m_context->pic_bmp_handle, vb2_context->image_data, width, height);
+		load_no_signal_image(v4l2m_context->pic_bmp_handle, vb2_context->image_data, width, height
+                , (pixfmt_out == YUYV) ? PIC_BMP_PIXFMT_YUYV
+                : (pixfmt_out == YVU420) ? PIC_BMP_PIXFMT_YV12
+                : (pixfmt_out == NV12) ? PIC_BMP_PIXFMT_NV12
+                : (pixfmt_out == RGB3 || pixfmt_out == BGR3) ? PIC_BMP_PIXFMT_RGB24
+                : PIC_BMP_PIXFMT_OTHERS);
 		vb2_context->image_type = V4L2_MODEL_VB2_IMAGE_NO_SIGNAL;
 	}
 
@@ -223,6 +238,7 @@ static int v4l2_model_qops_buf_prepare(struct vb2_buffer *vb)
 	v4l2_model_vb2_buffer_t *v4l2_buf =
 	    container_of(vb, v4l2_model_vb2_buffer_t, vb);
 #endif
+#if 0 //[AVTLD-79]+
 	const framegrabber_pixfmt_t *pixfmt;
 	int width, height;
 	int buffer_size = 0;
@@ -232,6 +248,8 @@ static int v4l2_model_qops_buf_prepare(struct vb2_buffer *vb)
 				     &height);
 	pixfmt =
 	    framegrabber_g_out_pixelfmt(v4l2m_context->framegrabber_handle);
+
+#endif //[AVTLD-79]-
 
 	v4l2_buf->buffer_info.planes = vb->num_planes;
 	v4l2_buf->buffer_info.buf_type = vb2_cxt->queue_type;
@@ -289,7 +307,9 @@ static int v4l2_model_qops_buf_prepare(struct vb2_buffer *vb)
 						    sg_dma_address(sg);
 						buf_descs[j].size =
 						    sg_dma_len(sg);
+#if 0 //[AVTLD-79]+
 		                buffer_size += buf_descs[j].size;
+#endif //[AVTLD-79]
 					}
 					buffer_info->buf_info[i] =
 					    v4l2_buf->buf_descs[i];
@@ -314,8 +334,18 @@ static int v4l2_model_qops_buf_prepare(struct vb2_buffer *vb)
 			break;
 		}
 		/* set vb2 plane bytesused size */
+#if 0 //[AVTLD-79]+
 		vb2_set_plane_payload(vb, i,
 				      width * height * (pixfmt->depth >> 3));
+#else
+        if (vb->num_planes == 1)
+            vb2_set_plane_payload(vb, i,
+                    framegrabber_g_out_framebuffersize(v4l2m_context->framegrabber_handle)); //rrr
+        else
+            //it did not verified under multi-planar format
+            vb2_set_plane_payload(vb, i,
+                    framegrabber_g_out_planarbuffersize(v4l2m_context->framegrabber_handle, i));
+#endif //[AVTLD-79]-
 		v4l2_buf->length += vb2_plane_size(vb, i);
 
 	}
@@ -769,6 +799,8 @@ void v4l2_model_buffer_done(v4l2_model_handle_t context)
     {
         u32 input_status, hdcp_flag;
         u8 *ptr = NULL;
+        const framegrabber_pixfmt_t *pixfmt = framegrabber_g_out_pixelfmt(v4l2m_context->framegrabber_handle);
+        framegrabber_pixfmt_enum_t pixfmt_out = pixfmt->pixfmt_out;
         input_status = framegrabber_g_input_status(v4l2m_context->framegrabber_handle);
         hdcp_flag = framegrabber_g_hdcp_flag(v4l2m_context->framegrabber_handle);
         if (input_status != FRAMEGRABBER_INPUT_STATUS_OK || hdcp_flag)
@@ -784,15 +816,25 @@ void v4l2_model_buffer_done(v4l2_model_handle_t context)
                 {
                     int width, height;
                     framegrabber_g_out_framesize(v4l2m_context->framegrabber_handle, &width, &height);
-                    load_no_signal_image(v4l2m_context->pic_bmp_handle, vb2_context->image_data, width, height);
-                    pr_info("load no signal done\n");
+                    load_no_signal_image(v4l2m_context->pic_bmp_handle, vb2_context->image_data, width, height
+                            , (pixfmt_out == YUYV) ? PIC_BMP_PIXFMT_YUYV
+                            : (pixfmt_out == YVU420) ? PIC_BMP_PIXFMT_YV12
+                            : (pixfmt_out == NV12) ? PIC_BMP_PIXFMT_NV12
+                            : (pixfmt_out == RGB3 || pixfmt_out == BGR3) ? PIC_BMP_PIXFMT_RGB24
+                            : PIC_BMP_PIXFMT_OTHERS);
+                    printk("load no signal done\n");
                 }
                 else if (type == V4L2_MODEL_VB2_IMAGE_COPY_PROTECTION)
                 {
                     int width, height;
                     framegrabber_g_out_framesize(v4l2m_context->framegrabber_handle, &width, &height);
-                    load_copy_protection_image(v4l2m_context->pic_bmp_handle, vb2_context->image_data, width, height);
-                    pr_info("load copy protection done\n");
+                    load_copy_protection_image(v4l2m_context->pic_bmp_handle, vb2_context->image_data, width, height
+                            , (pixfmt_out == YUYV) ? PIC_BMP_PIXFMT_YUYV
+                            : (pixfmt_out == YVU420) ? PIC_BMP_PIXFMT_YV12
+                            : (pixfmt_out == NV12) ? PIC_BMP_PIXFMT_NV12
+                            : (pixfmt_out == RGB3 || pixfmt_out == BGR3) ? PIC_BMP_PIXFMT_RGB24
+                            : PIC_BMP_PIXFMT_OTHERS);
+                    printk("load copy protection done\n");
                 }
                 vb2_context->image_type = type;
             }
@@ -810,10 +852,9 @@ void v4l2_model_buffer_done(v4l2_model_handle_t context)
                 case V4L2_MODEL_BUF_TYPE_DMA_SG:
                 {
                     struct sg_table *sgt = vb2_dma_sg_plane_desc(vb, 0);
-                    int width, height;
-                    framegrabber_g_out_framesize(v4l2m_context->framegrabber_handle, &width, &height);
+                    unsigned framebufsize = framegrabber_g_out_framebuffersize(v4l2m_context->framegrabber_handle);
 
-                    sg_copy_from_buffer(sgt->sgl, sgt->nents, ptr, width * height * 2);
+                    sg_copy_from_buffer(sgt->sgl, sgt->nents, ptr, framebufsize);
                 }
                     break;
                 case V4L2_MODEL_BUF_TYPE_DMA_CONT:

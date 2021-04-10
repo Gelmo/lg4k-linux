@@ -212,6 +212,8 @@ static int snd_sagitta_pcm_open(struct snd_pcm_substream *substream)
     struct sagitta_snd_dev *sdev = snd_pcm_substream_chip(substream);
     struct snd_pcm_runtime *runtime = substream->runtime;
 
+    pr_info("%s\n", __func__);
+
     sdev->substream = substream;
     runtime->hw = snd_sagitta_hw;
     snd_pcm_hw_constraint_integer(runtime, SNDRV_PCM_HW_PARAM_PERIODS);
@@ -224,6 +226,8 @@ static int snd_sagitta_pcm_open(struct snd_pcm_substream *substream)
 static int snd_sagitta_pcm_close(struct snd_pcm_substream *substream)
 {
     struct sagitta_snd_dev *sdev = snd_pcm_substream_chip(substream);
+
+    pr_info("%s\n", __func__);
 
     sdev->substream = NULL;
 
@@ -301,6 +305,8 @@ static int snd_sagitta_card_trigger(struct snd_pcm_substream *substream,
 {
 	struct sagitta_snd_dev *sdev = snd_pcm_substream_chip(substream);
 
+    pr_info("%s\n", __func__);
+
     switch(cmd)
     {
     case SNDRV_PCM_TRIGGER_START:
@@ -351,6 +357,8 @@ static int snd_sagitta_pcm(struct sagitta_snd_dev *dev,
     struct snd_pcm *pcm;
     int err;
 
+    pr_info("%s\n", __func__);
+
     err = snd_pcm_new(dev->card, name, device_idx, 0, 1, &pcm);
     if(err < 0)
         return err;
@@ -371,6 +379,7 @@ static struct sagitta_snd_dev *audio_dev_register(struct sagitta_dev *sdev)
 
     int err;
 
+    pr_info("%s\n", __func__);
 #if 0
     snd_dev = kmalloc(sizeof(struct sagitta_snd_dev), GFP_KERNEL);
     if(!snd_dev) {
@@ -470,6 +479,7 @@ static void alsa_disconnect(struct sagitta_module *module, struct sagitta_dev *s
     //struct sagitta_snd_dev *ssdev =   (struct sagitta_snd_dev *) sagitta_virtdev_getdata(svdev);
 	struct sagitta_snd_dev *ssdev =   (struct sagitta_snd_dev *)alsa_mod->context;
 
+    pr_info("%s\n", __func__);
 
     //sagitta_trace(module, "%s\n", __func__);
 
