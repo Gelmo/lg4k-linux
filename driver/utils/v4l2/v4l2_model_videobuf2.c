@@ -152,11 +152,11 @@ static int v4l2_model_qops_queue_setup(struct vb2_queue *q,
 	pixfmt_out = pixfmt->pixfmt_out;
 
 
-	//printk("%s framebufsize %u, width %d, height %d\n", __func__,
+	//pr_info("%s framebufsize %u, width %d, height %d\n", __func__,
 	//       framebufsize, width, height);
 
 	framebufsize = framegrabber_g_out_framebuffersize(v4l2m_context->framegrabber_handle);
-	printk("%s >>>>>> framebufsize %u, width %d, height %d\n",
+	pr_info("%s >>>>>> framebufsize %u, width %d, height %d\n",
 		__func__, framebufsize, width, height);
 
 	if (v4l2m_context->pic_bmp_handle)
@@ -822,7 +822,7 @@ void v4l2_model_buffer_done(v4l2_model_handle_t context)
                             : (pixfmt_out == NV12) ? PIC_BMP_PIXFMT_NV12
                             : (pixfmt_out == RGB3 || pixfmt_out == BGR3) ? PIC_BMP_PIXFMT_RGB24
                             : PIC_BMP_PIXFMT_OTHERS);
-                    printk("load no signal done\n");
+                    pr_info("load no signal done\n");
                 }
                 else if (type == V4L2_MODEL_VB2_IMAGE_COPY_PROTECTION)
                 {
@@ -834,7 +834,7 @@ void v4l2_model_buffer_done(v4l2_model_handle_t context)
                             : (pixfmt_out == NV12) ? PIC_BMP_PIXFMT_NV12
                             : (pixfmt_out == RGB3 || pixfmt_out == BGR3) ? PIC_BMP_PIXFMT_RGB24
                             : PIC_BMP_PIXFMT_OTHERS);
-                    printk("load copy protection done\n");
+                    pr_info("load copy protection done\n");
                 }
                 vb2_context->image_type = type;
             }
