@@ -14,7 +14,7 @@ else
 KERNEL_VER:=$(shell uname -r)
 endif
 
-BOARD ?= gc573
+BOARD ?= cx511h
 
 ifeq ($(MAKELEVEL),0)
 export BASE_DIR:=$(realpath $(dir $(MAKEFILE_LIST)))/
@@ -25,9 +25,9 @@ MODULE_NAME ?= $(BOARD)
 UTILS_DIR := $(BASE_DIR)utils/
 LIB_DIR := $(BASE_DIR)lib/
 
-ifeq ($(call check_dir,$(BOARD_BASE_DIR)/$(BOARD)),$(NULL))
-$(error no board $(BOARD) exists)
-endif
+# ifeq ($(call check_dir,$(BOARD_BASE_DIR)/$(BOARD)),$(NULL))
+# $(error no board $(BOARD) exists)
+# endif
 
 basic-objs := entry.o cxt_mgr.o
 
