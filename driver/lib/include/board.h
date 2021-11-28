@@ -2,7 +2,7 @@
  * Copyright(c) AVerMedia TECHNOLOGIES, Inc. 2017
  * All rights reserved
  * =================================================================
- * board_v4l2.h
+ * board.h
  *
  *  Created on: Apr 15, 2017
  *      Author: 
@@ -15,22 +15,43 @@
  * and open the template in the editor.
  */
 
-#ifndef BOARD_V4L2_H
-#define BOARD_V4L2_H
+#ifndef BOARD_H
+#define BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void board_v4l2_init(cxt_mgr_handle_t cxt_mgr, int board_id);
-void board_v4l2_suspend(cxt_mgr_handle_t cxt_mgr);
-void board_v4l2_resume(cxt_mgr_handle_t cxt_mgr);
-//void cx511h_adv7619_set_bchs(framegrabber_handle_t handle);
-#define BOARD_V4L2_CXT_ID fourcc_id('B','V','4','L')
+typedef enum
+{
+    CL511H=0,
+    SUPPORT_BOARD_NUM,        
+}board_type_e;
+
+enum cl511h_input_e
+{
+    CL511H_HDMI_INPUT=0,
+    CL511H_INPUT_COUNT,
+};
+
+enum cl511h_i2c_chip_e
+{
+    CL511H_I2C_CHIP_ITE6805_0,
+    CL511H_I2C_CHIP_COUNT,
+};
+
+typedef struct
+{
+    const char *name;
+    int index;
+}board_chip_desc_t;
+
+int board_init(void);
+void board_exit(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_V4L2_H */
+#endif /* BOARD_H */
 

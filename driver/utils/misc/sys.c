@@ -9,7 +9,10 @@
  *      Version:
  * =================================================================
  */
- #include "typedef.h"
+
+#define pr_fmt(fmt) KBUILD_MODNAME ": " "%s, %d: " fmt, __func__, __LINE__
+
+#include "typedef.h"
 #include <linux/version.h>
 #include <linux/kernel.h>
 #include <linux/mutex.h>
@@ -338,13 +341,13 @@ void *sys_fopen(const char *filename, enum sys_fop_flag_e flag)
 
     if (!filename)
     {
-        printk("Error: NULL pointer");
+        pr_err("Error: NULL pointer");
         return NULL;
     }
 
     if (flag & ~SYS_FOP_FLAG_BIT_MASK)
     {
-        printk("Error: the flag is not supported ");
+        pr_err("Error: the flag is not supported ");
         return NULL;
     }
 
@@ -354,7 +357,6 @@ void *sys_fopen(const char *filename, enum sys_fop_flag_e flag)
         new_flag = O_RDONLY;
     else if ((flag & SYS_FOP_FLAG_WRITE_BIT))
         new_flag = O_WRONLY;
-
 
     fp = filp_open(filename, new_flag, 0);
 

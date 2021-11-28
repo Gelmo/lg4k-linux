@@ -49,6 +49,7 @@ typedef struct
 	//struct v4l2_device *v4l2_dev;
 	void *data;
 	int current_dual_pixel;
+	int current_output_bytesperline;
 
 	framegrabber_interface_t interface;
     unsigned int hdcp_flag;

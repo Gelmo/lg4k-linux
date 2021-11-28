@@ -17,10 +17,24 @@
 #include <linux/version.h>
 #include <linux/pci.h>
 #include "aver_version.h"
+#include "board.h"
 
 //#define DRIVER_VER "1.0.0026"
-int board_init(void);
-void board_exit(void);
+//int board_init(void);
+//void board_exit(void);
+
+char *no_signal_pic = NULL;
+module_param(no_signal_pic, charp, 0444);
+MODULE_PARM_DESC(no_signal_pic, "Loading this bitmap file and display it when the input is no signal");
+
+//char *out_of_range_pic = NULL;
+//module_param(out_of_range_pic, charp, 0444);
+//MODULE_PARM_DESC(out_of_range_pic, "Loading this bitmap file and display it when the content is out of range");
+
+char *copy_protetion_pic = NULL;
+module_param(copy_protetion_pic, charp, 0444);
+MODULE_PARM_DESC(copy_protetion_pic, "Loading this bitmap file and display it when the content was protected");
+
 static int __init aver_init(void)
 {
     int ret=0;
