@@ -9,7 +9,7 @@
 #fi
 
 MODULE_INSTALL_DIR=/lib/modules/`uname -r`/kernel/drivers/media/avermedia
-install -d  $MODULE_INSTALL_DIR
-install -m 644 driver/gc573.ko $MODULE_INSTALL_DIR
+install -d $MODULE_INSTALL_DIR
+install -m 644 driver/cx511h.ko $MODULE_INSTALL_DIR
 
 /sbin/depmod -a
