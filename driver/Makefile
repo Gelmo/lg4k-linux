@@ -51,7 +51,12 @@ $(MODULE_NAME)-objs += $(lib_objs)
 
 #$(call add_cflags, $(MODULE_NAME)-objs, common-include)  -fno-common
 
+ifeq ($(CC),clang)
+EXTRA_CFLAGS += -Wno-vla -Wno-declaration-after-statement $(common-include) 
+else
 EXTRA_CFLAGS += -Wno-vla -Wno-declaration-after-statement $(common-include)  -Wno-maybe-uninitialized
+endif
+
 EXTRA_LDFLAGS += --whole-archive
 obj-m += $(MODULE_NAME).o
 
