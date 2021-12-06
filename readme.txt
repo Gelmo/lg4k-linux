@@ -1,7 +1,7 @@
-1. build cl511hn ko file
+1. build gc573 ko file
   ./build.sh
 
-2. install cl511hn ko file 
+2. install gc573 ko file 
   sudo ./install.sh 
 3. preview 
   ./gst_1.0_raw_video_audio.sh 

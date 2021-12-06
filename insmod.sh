@@ -6,4 +6,4 @@ modprobe videobuf2-dma-sg
 modprobe videobuf2-v4l2
 modprobe videobuf2-vmalloc
 modprobe videodev
-insmod driver/cx511h.ko
+insmod driver/gc573.ko

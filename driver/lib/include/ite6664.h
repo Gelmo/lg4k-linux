@@ -167,8 +167,8 @@ typedef enum
     ITE6664_HDCP,           
 }ite6664_event_e;
 
-#define CE511H_ID ce511h
-#define CE511H_DRVNAME I2C_MODEL_MODULE_STR(ce511h)
+#define GC573_ID gc573
+#define GC573_DRVNAME I2C_MODEL_MODULE_STR(gc573)
 
 enum    
 {
@@ -192,7 +192,7 @@ typedef struct
     U8_T slave_addr_cfg[SLAVE_ADDR_COUNT];
     hotplug_ctrl_func_t  hotplug_ctrl_func;
     hw_reset_func_t      hw_reset_func;
-}ce511h_cfg_t;
+}gc573_cfg_t;
 
 
 typedef enum

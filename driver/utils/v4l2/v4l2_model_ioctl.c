@@ -75,7 +75,7 @@ enum v4l2_bchs_type {
 	V4L2_BCHS_TYPE_SATURATION,
 };
 
-static struct v4l2_queryctrl g_cx511h_ctrls[] = 
+static struct v4l2_queryctrl g_gc573_ctrls[] = 
 {
 	#if 1
 	{
@@ -152,15 +152,15 @@ static struct v4l2_queryctrl g_cx511h_ctrls[] =
 	#endif
 };
 
-#define ARRAY_SIZE_OF_CTRL		(sizeof(g_cx511h_ctrls)/sizeof(g_cx511h_ctrls[0]))
+#define ARRAY_SIZE_OF_CTRL		(sizeof(g_gc573_ctrls)/sizeof(g_gc573_ctrls[0]))
 
 static struct v4l2_queryctrl *find_ctrl(unsigned int id)
 {
 	int i;
 	//scan supported queryctrl table
 	for( i=0; i<ARRAY_SIZE_OF_CTRL; ++i )
-		if( g_cx511h_ctrls[i].id==id )
-			return &g_cx511h_ctrls[i];
+		if( g_gc573_ctrls[i].id==id )
+			return &g_gc573_ctrls[i];
 
 	return 0;
 }
